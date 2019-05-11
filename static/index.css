@@ -1,0 +1,217 @@
+:root {
+  --warning-color: #fb8532;
+  --alert-color: #d63a4a;
+}
+[hidden] { display: none !important }
+html {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: white;
+  color: #24292e;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: #443A83;
+  color: white;
+  height: 4rem;
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+}
+
+header svg {
+  fill: white;
+  opacity: 0.6;
+}
+
+.nav-history .link-history svg {
+  opacity: 1
+}
+.nav-settings .link-settings svg {
+  opacity: 1
+}
+.nav-main .link-main svg {
+  opacity: 1
+}
+
+main {
+  background: linear-gradient(#9a66c7, #5d58b6);
+  display: flex;
+  flex-direction: column;
+  flex: 2;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 30px;
+}
+
+main button {
+  appearance: none;
+  border-radius: 100%;
+  background: none;
+  border: 8px solid;
+  width: 15rem;
+  height: 15rem;
+  font-size: 4rem;
+  color: white;
+  outline: none;
+  padding: 0;
+}
+
+@keyframes warning-pulse {
+  0% {
+    color: white;
+  }
+  50% { 
+    color: var(--warning-color);
+  }
+}
+
+@keyframes alert-pulse {
+  0% {
+    color: white;
+    border-color: white;
+  }
+  100% { 
+    color: var(--alert-color);
+    border-color: var(--alert-color);
+  }
+}
+
+main button.warning,
+main button.warning + time{
+  animation: warning-pulse 2s ease alternate infinite;
+}
+
+main button.alert,
+main button.alert + time{
+  animation: alert-pulse 2s ease alternate infinite;
+}
+
+main time {
+  display: block;
+  font-size: 3rem;
+  color: white;
+  height: 3rem;
+}
+
+main button:focus {
+  border: 10px solid;
+}
+
+footer {
+  background: white;
+  min-height: 10rem;
+  flex: 1;
+  position: relative;
+  padding-top: 5px;
+}
+
+footer:before {
+  content: "";
+  display: block;
+  background: white;
+  position: absolute;
+  border-radius: 100%;
+  width: 120%;
+  left: -10%;
+  height: 60px;
+  top: -30px;
+}
+
+footer .note {
+  font-weight: normal;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+footer .note.warning {
+  color: var(--warning-color);
+}
+
+footer .note.alert {
+  color: var(--alert-color);
+}
+
+.history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  text-align: center;
+  max-height: 10rem;
+  overflow: scroll;
+}
+.nav-history .history {
+  max-height: auto;
+  overflow: none;
+}
+
+.history dt {
+  display: inline-block;
+  font-weight: bold;
+}
+
+.history dd {
+  display: inline-block;
+  margin: 0 0.5rem;
+}
+
+.settings {
+  display: none;
+  padding: 2rem;
+}
+
+.settings button {
+  appearance: none;
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 0;
+  background: #443a83;
+  color: white;
+  padding: 1rem;
+  font-size: 1.5rem;
+  margin: 1rem 0;
+  outline: none;
+}
+
+.settings .delete {
+  background: var(--alert-color);
+}
+
+.settings .delete:hover {
+  background: #ea4a5a;
+}
+
+.settings .delete:focus {
+  background: #cb2431;
+}
+
+.nav-history main {
+  height: 0;
+  display: none;
+}
+.nav-history footer:before {
+  display: none;
+}
+.nav-settings main {
+  height: 0;
+  display: none;
+}
+.nav-settings footer {
+  display: none;
+}
+.nav-settings .settings {
+  display: block;
+}
