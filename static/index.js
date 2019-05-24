@@ -6,14 +6,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const historyItemTemplate = document.querySelector('template#history-entry')
   let timer = null
   const setItem = (i, json) => localStorage[i] = JSON.stringify(json)
-  const getItem = i => localStorage[i] ? JSON.parse(localStorage[i]) : null
+  const getItem = i => {
+    if (!localStorage[i]) return null
+    const item = JSON.parse(localStorage[i])
+    item.start = new Date(item.start)
+    item.end = item.end ? new Date(item.end) : false
+    return item
+  }
+  const getPrefs = () => JSON.parse(localStorage['_prefs'] || '{}')
+  const setPrefs = v => setItem('_prefs', v)
+  const setPref = (k, v) => {
+    const prefs = getPrefs()
+    prefs[k] = v
+    setItem('_prefs', prefs)
+  }
+  const initPrefs = () => setPrefs(Object.assign({
+    contractionWindow: 10,
+    contractionCount: 3,
+    contractionTime: 45,
+  }, getPrefs()))
   const getItems = () => {
     const items = []
     for(let i = 0; i < localStorage.length; ++i) {
       const item = getItem(i)
-      item.start = new Date(item.start)
-      item.end = item.end ? new Date(item.end) : false
-      if (!item) break
+      if (!item) return items
       items.push(item)
     }
     return items
@@ -31,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tickContraction = () => {
     const items = getItems()
     const current = items[items.length - 1]
+    if (!current) return
     const now = Date.now()
     if (contractionButton.textContent !== 'Stop') {
       contractionButton.textContent = 'Stop'
@@ -77,10 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const last = items[items.length - 1]
     contractionButton.classList.remove('warning', 'alert')
     note.classList.remove('warning', 'alert')
-    if (items.length >= 3 && (last.start - items[items.length - 3].start) < 600000) {
+    const {contractionCount, contractionWindow, contractionTime} = getPrefs()
+    if (items.length >= contractionCount && last.start - items[items.length - contractionCount].start < contractionWindow * 60000) {
       note.classList.add('alert')
       contractionButton.classList.add('alert')
-      note.textContent = 'It is time to go to the hospital'
+      note.textContent = `That's ${contractionCount} contractions in ${contractionWindow} minutes! You should let your midwife know`
+    } else if (last && (last.end||Date.now()) - last.start > contractionTime * 1000) {
+      note.classList.add('alert')
+      contractionButton.classList.add('alert')
+      note.textContent = `That contraction lasted over ${contractionTime} seconds! You should let your midwife know`
     } else if (last && !last.end && Date.now() - last.start > 60000) {
       const className = Date.now() - last.start > 360000 ? 'alert' : 'warning'
       note.classList.add(className)
@@ -115,17 +137,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const deleteHistory = () => {
     if (confirm('Are you sure you want to delete all history?')) {
+      stopContraction()
       for(const key in localStorage) {
         if (Number.isNaN(key)) continue
         delete localStorage[key]
       }
-      localStorage.length = 0
+      window.location.reload()
     }
   }
 
   const deletePrefs = () => {
-    if (confirm('Are you sure you want to delete all history?')) {
+    if (confirm('Are you sure you want to delete preferences? This won\'t delete your history.')) {
       delete localStorage['_prefs']
+      window.location.reload()
+    }
+  }
+
+  const prefsListener = () => {
+    const prefs = getPrefs()
+    for (const el of document.querySelectorAll('.js-pref-field')) {
+      el.value = prefs[el.getAttribute('name')]
+      el.addEventListener('input', e => {
+        if (el.getAttribute('type') === 'tel' && isNaN(e.data)) {
+          el.value = el.value.replace(/[^\d]/g, '')
+        }
+        setPref(el.getAttribute('name'), el.value)
+      })
     }
   }
 
@@ -145,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.addEventListener('click', event => {
-    console.log(event.target)
     if (!event.target) return
     if (!event.target.matches) return
     if (event.target.matches('.js-stop-start')) {
@@ -153,14 +189,16 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (event.target.matches('.js-delete-history')) {
       deleteHistory(event)
     } else if (event.target.matches('.js-delete-prefs')) {
-      deleteHistory(event)
+      deletePrefs(event)
     } else if (event.target.closest('.js-footer')) {
       window.location.hash = '#history'
     }
   })
 
   window.addEventListener('hashchange', router)
+  initPrefs()
   router()
   renderHistory()
   stopStartContraction()
+  prefsListener()
 })

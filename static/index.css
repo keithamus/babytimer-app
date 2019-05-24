@@ -173,6 +173,32 @@ footer .note.alert {
   padding: 2rem;
 }
 
+.settings input {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  background: rgba(0, 0, 0, 0.15);
+  display: inline-block;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin: 0 0.5rem;
+}
+
+.settings input[type="tel"] {
+  text-align: center;
+}
+
+.settings input[type="tel"][maxlength="1"] {
+  width: 20px;
+}
+.settings input[type="tel"][maxlength="2"] {
+  width: 40px;
+}
+.settings input[type="tel"][maxlength="3"] {
+  width: 60px;
+}
+
 .settings button {
   appearance: none;
   width: 100%;
