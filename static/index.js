@@ -34,15 +34,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return items
   }
-  const formatDuration = time => {
-    let s = time / 1000
-    if (s % 3600) {
-      return `${(s / 3600).toFixed(0)}h ${((s % 3600) / 60).toFixed(0)}m ${((s % 3600) % 60).toFixed(0)}s`
+  const durations = [3600000, 60000, 1000]
+  const postfixes = ['h', 'm', 's']
+  const formatDuration = t => {
+    let s = ''
+    for(let i = 0; i < durations.length; ++i) {
+      const d = durations[i]
+      const p = postfixes[i]
+      if (t / d > 1) {
+        s += `${String(Math.floor(t /d )).padStart(2, 0)}${p} `
+        t %= d
+      }
     }
-    if (s % 60) {
-      return `${(s / 60).toFixed(0)}m ${(s % 60).toFixed(0)}s`
-    }
-    return (time / 1000).toFixed(0) + 's'
+    return s
   }
   const tickContraction = () => {
     const items = getItems()
